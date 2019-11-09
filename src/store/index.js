@@ -65,21 +65,13 @@ export default new Vuex.Store({
       }
       state.cards = cards_new
     },
-    add_cards (state, context) {
-      /*
-       * context should be an object providing cards and type of cards (due, overdue, not scheduled)
-       * context = {
-       *   type: 'cards_overdue'
-       *   cards: { .. }
-       * }
-       */
-      // Update and merge existing cards in store with new data
+    add_cards (state, cards) {
       let cards_new = {
-        ...state[context.type],
-        ...context.cards
+        ...state.cards,
+        ...cards
       }
 
-      state[context.type] = cards_new
+      state.cards = cards_new
     }
   },
   actions: {
@@ -103,8 +95,6 @@ export default new Vuex.Store({
       })
     },
     get_cards (context) {
-      let today = new Date()
-
       context.state.boards_selected.forEach(board_id => {
         trelloAPI.get(`boards/${board_id}/cards`, {
           params: {
@@ -115,44 +105,19 @@ export default new Vuex.Store({
           }
         }).then(response => {
           let cards = {}
-          let cards_overdue = {}
-          let cards_not_scheduled = {}
 
           // Process each card
           response.data.forEach(c => {
-            c['board_id'] = board_id
+            // Only process cards which are not yet completed
+            if (!c.dueComplete) {
+              c['board_id'] = board_id
+              c['due'] = new Date(c.due)
 
-            // Not scheduled without due date
-            if (c.due === null) {
-              cards_not_scheduled[c.id] = c
-            } else {
-              // Only process cards which are not yet completed
-              if (!c.dueComplete) {
-                c.due = new Date(c.due)
-
-                if (c.due < today) {
-                  // Overdue cards
-                  cards_overdue[c.id] = c
-                } else {
-                  // Cards due in the future
-                  cards[c.id] = c
-                }
-              }
+              cards[c.id] = c
             }
           })
 
-          context.commit('add_cards', {
-            type: 'cards',
-            cards: cards
-          })
-          context.commit('add_cards', {
-            type: 'cards_overdue',
-            cards: cards_overdue
-          })
-          context.commit('add_cards', {
-            type: 'cards_not_scheduled',
-            cards: cards_not_scheduled
-          })
+          context.commit('add_cards', cards)
         })
       })
     }
