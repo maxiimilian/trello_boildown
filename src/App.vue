@@ -1,31 +1,31 @@
 <template>
   <div id="app">
-    <BoardMultiSelect/>
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to my app"/>
+    <TrelloAuth />
+    <div v-if="connected">
+        <BoardMultiSelect/>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import BoardMultiSelect from './components/BoardMultiSelect.vue'
+import TrelloAuth from './components/TrelloAuth.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld,
-    BoardMultiSelect
+    BoardMultiSelect,
+    TrelloAuth
+  },
+  computed: {
+    connected () {
+      return this.$store.state.trello_auth.connected
+    }
   }
 }
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

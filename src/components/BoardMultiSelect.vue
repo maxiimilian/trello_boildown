@@ -1,7 +1,7 @@
 <template>
-    <div class="board_multi_select">
+    <div id="board_multi_select">
         <select multiple>
-            <option v-for="b in boards" v-bind:key="b.name" v-bind:selected="b.selected">{{ b.name }}</option>
+            <option v-for="b in boards" v-bind:key="b.name" v-bind:value="b.id">{{ b.name }}</option>
         </select>
     </div>
 </template>
@@ -13,7 +13,7 @@ export default {
     return {}
   },
   computed: {
-    boards: function () {
+    boards () {
       return this.$store.state.boards
     }
   }
