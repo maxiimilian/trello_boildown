@@ -3,6 +3,18 @@
     <TrelloAuth />
     <div v-if="connected">
         <BoardMultiSelect/>
+
+        <div>
+            <ul>
+                <li v-for="c in cards_overdue" v-bind:key="c.id">{{ c.name }}</li>
+            </ul><br />
+            <ul>
+                <li v-for="c in cards" v-bind:key="c.id">{{ c.name }}</li>
+            </ul><br />
+            <ul>
+                <li v-for="c in cards_not_scheduled" v-bind:key="c.id">{{ c.name }}</li>
+            </ul>
+        </div>
     </div>
   </div>
 </template>
@@ -20,6 +32,15 @@ export default {
   computed: {
     connected () {
       return this.$store.state.trello_auth.connected
+    },
+    cards () {
+      return this.$store.state.cards
+    },
+    cards_overdue () {
+      return this.$store.state.cards_overdue
+    },
+    cards_not_scheduled () {
+      return this.$store.state.cards_not_scheduled
     }
   }
 }

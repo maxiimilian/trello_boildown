@@ -26,7 +26,8 @@ store.subscribe((mutation, state) => {
       key: state.trello_auth.key,
       token: state.trello_auth.token,
       connected: false
-    }
+    },
+    boards_selected: state.boards_selected
   }
 
   localStorage.setItem('store', JSON.stringify(store))
