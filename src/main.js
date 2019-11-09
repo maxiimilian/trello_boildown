@@ -13,8 +13,14 @@ new Vue({
   render: h => h(App),
   beforeCreate () {
     this.$store.commit('init_store')
+  },
+  created () {
     if (this.$store.state.trello_auth.key !== '' && this.$store.state.trello_auth.token !== '') {
-      this.$store.dispatch('get_my_boards')
+      this.$store.dispatch('get_my_boards').then(() => {
+        if (this.$store.state.trello_auth.connected && this.$store.state.boards_selected !== []) {
+          this.$store.dispatch('get_cards')
+        }
+      })
     }
   }
 }).$mount('#app')

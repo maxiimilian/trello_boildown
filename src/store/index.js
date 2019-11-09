@@ -8,13 +8,29 @@ const trelloAPI = axios.create({
   baseURL: 'https://api.trello.com/1/'
 })
 
+function sort_cards_by_due (cards, asc = true) {
+  /* Returns a sorted card array, sorted ascending (default) or descending */
+  return cards.sort(function (c1, c2) {
+    return asc ? c1.due - c2.due : c2.due - c1.due
+  })
+}
+
+function sort_cards_by_board_name (cards, asc = true) {
+  return cards.sort(function (c1, c2) {
+    if (c1.board_id === c2.board_id) {
+      return c1.name > c2.name ? -1 : 1
+    } else {
+      return c1.board_id > c2.board_id ? -1 : 1
+    }
+  })
+}
+
 export default new Vuex.Store({
   state: {
     boards: {},
     boards_selected: [],
-    cards: {},
-    cards_overdue: {},
-    cards_not_scheduled: {},
+    cards: [],
+    last_refresh: null,
     trello_auth: {
       key: '',
       token: '',
@@ -55,23 +71,24 @@ export default new Vuex.Store({
     },
     remove_cards (state, board_id) {
       /* Remove cards for board_id */
-      let cards_new = {}
-
-      for (let c_id in state.cards) {
-        let c = state.cards[c_id]
-        if (c.board_id !== board_id) {
-          cards_new[c_id] = c
-        }
-      }
-      state.cards = cards_new
+      state.cards = state.cards.filter(c => c.board_id !== board_id)
     },
     add_cards (state, cards) {
-      let cards_new = {
-        ...state.cards,
+      // Get only ids of new cards
+      let cards_new_ids = []
+      cards.forEach(c => cards_new_ids.push(c.id))
+
+      // Create new cards array but exclude "old" cards with same id as new cards
+      let cards_new = [
+        // Filter: return cards with ids NOT in cards_new_ids array
+        ...state.cards.filter(c => !cards_new_ids.includes(c.id)),
         ...cards
-      }
+      ]
 
       state.cards = cards_new
+    },
+    set_last_refresh (state) {
+      state.last_refresh = new Date()
     }
   },
   actions: {
@@ -100,28 +117,52 @@ export default new Vuex.Store({
           params: {
             key: context.state.trello_auth.key,
             token: context.state.trello_auth.token,
-            fields: 'name,dueComplete,due',
+            fields: 'name,dueComplete,due,isTemplate',
             filter: 'open'
           }
         }).then(response => {
-          let cards = {}
+          let cards = []
 
           // Process each card
           response.data.forEach(c => {
             // Only process cards which are not yet completed
-            if (!c.dueComplete) {
+            if (!c.dueComplete && !c.isTemplate) {
               c['board_id'] = board_id
-              c['due'] = new Date(c.due)
+              if (c.due !== null) {
+                c['due'] = new Date(c.due)
+              }
 
-              cards[c.id] = c
+              cards.push(c)
             }
           })
 
           context.commit('add_cards', cards)
+          context.commit('set_last_refresh')
         })
       })
     }
   },
   modules: {
+  },
+  getters: {
+    cards_not_scheduled: state => {
+      return sort_cards_by_board_name(
+        state.cards.filter(c => c.due === null)
+      )
+    },
+    cards_overdue: state => {
+      let today = new Date()
+      today.setHours(0, 0, 0)
+      return sort_cards_by_due(
+        state.cards.filter(c => c.due !== null).filter(c => c.due < today)
+      )
+    },
+    cards_due: state => {
+      let today = new Date()
+      today.setHours(0, 0, 0)
+      return sort_cards_by_due(
+        state.cards.filter(c => c.due !== null).filter(c => c.due >= today)
+      )
+    }
   }
 })

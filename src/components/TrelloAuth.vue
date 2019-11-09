@@ -4,11 +4,11 @@
             <label>
                 Trello Token
                 <input type="text" name="trello_auth_token" v-model.lazy="token"/>
-            </label>
+            </label><br />
             <label>
                 Trello Key
                 <input type="text" name="trello_auth_key" v-model.lazy="key"/>
-            </label>
+            </label><br />
             <input type="submit" value="Connect" v-on:click="get_my_boards"/>
         </div>
         <div v-if="connected">
@@ -52,3 +52,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+</style>
