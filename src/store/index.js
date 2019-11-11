@@ -97,7 +97,7 @@ export default new Vuex.Store({
         params: {
           key: context.state.trello_auth.key,
           token: context.state.trello_auth.token,
-          fields: 'name',
+          fields: 'name,shortUrl',
           filter: 'open'
         }
       }).then(response => {
@@ -151,15 +151,13 @@ export default new Vuex.Store({
       )
     },
     cards_overdue: state => {
-      let today = new Date()
-      today.setHours(0, 0, 0)
+      let today = new Date().setHours(0, 0, 0)
       return sort_cards_by_due(
         state.cards.filter(c => c.due !== null).filter(c => c.due < today)
       )
     },
     cards_due: state => {
-      let today = new Date()
-      today.setHours(0, 0, 0)
+      let today = new Date().setHours(0, 0, 0)
       return sort_cards_by_due(
         state.cards.filter(c => c.due !== null).filter(c => c.due >= today)
       )

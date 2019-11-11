@@ -1,19 +1,21 @@
 <template>
-  <div id="app" class="container">
-    <div class="level">
-        <TrelloAuth class="level-left"/>
-        <BoardMultiSelect class="level-right" v-if="connected"/>
+  <div id="app" class="ui container">
+    <div id="header">
+        <h1 class="ui header left floated">Trello Boildown</h1>
+        <button class="ui negative button right floated" v-on:click="disconnect">Disconnect</button>
     </div>
+    <div class="ui clearing divider"></div>
 
-    <div v-if="connected" id="cardlists">
-        <h3 class="title">Overdue ({{ cards_overdue.length }})</h3>
-        <CardList v-bind:cards="cards_overdue"/>
+    <div>
+        <TrelloAuth />
+        <BoardMultiSelect v-if="connected"/>
+    </div>
+    <div class="ui clearing divider"></div>
 
-        <h3 class="title">Due ({{ cards_due.length }})</h3>
-        <CardList v-bind:cards="cards_due"/>
-
-        <h3 class="title">Not scheduled</h3>
-        <CardList v-bind:cards="cards_not_scheduled"/>
+    <div class="" v-if="connected" id="cardlists">
+        <CardList header="Overdue" v-bind:cards="cards_overdue" initially_collapsed/>
+        <CardList header="Due" v-bind:cards="cards_due"/>
+        <CardList header="Not Scheduled" v-bind:cards="cards_not_scheduled"/>
     </div>
   </div>
 </template>
@@ -46,16 +48,17 @@ export default {
     cards_due () {
       return this.$store.getters.cards_due
     }
+  },
+  methods: {
+    disconnect () {
+      this.$store.commit('set_connection_state', false)
+    }
   }
 }
 </script>
 
 <style>
-#app {
-    width: 100%;
-}
-#trello_auth {
-}
-#board_multi_select {
+#header {
+    padding-top: 14px;
 }
 </style>

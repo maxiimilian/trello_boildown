@@ -1,15 +1,14 @@
 <template>
-    <div id="board_multi_select">
-        <div class="field has-addon">
-        <div class="select is-multiple is-small">
-          <select multiple v-model="boards_selected">
-              <option v-for="b in boards" v-bind:key="b.id" v-bind:value="b.id">{{ b.name }}</option>
-          </select>
+    <div id="board_multi_select" class="ui form">
+        <div class="field">
+            <label class="label">
+                Select boards to load
+                <select class="" multiple v-model="boards_selected">
+                    <option v-for="b in boards" v-bind:key="b.id" v-bind:value="b.id">{{ b.name }}</option>
+                </select>
+            </label>
         </div>
-        <div class="control">
-            <input class="button" type="submit" v-on:click="reload" value="Reload" />
-        </div>
-        </div>
+        <button class="ui primary button" v-on:click="reload">Reload</button>
         <span>Last refresh: {{ last_refresh }}</span>
     </div>
 </template>
@@ -48,6 +47,9 @@ export default {
       console.log('Reload triggered')
       this.$store.dispatch('get_cards')
     }
+  },
+  created () {
+    this.reload()
   }
 }
 </script>

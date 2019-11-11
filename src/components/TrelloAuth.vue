@@ -1,19 +1,19 @@
 <template>
-    <div id="trello_auth">
+    <div id="trello_auth" class="ui form">
         <div v-if="!connected">
-            <label class="label">
-                Trello Token
-                <input class="input" type="text" name="trello_auth_token" v-model.lazy="token"/>
-            </label>
-            <label class="label">
-                Trello Key
-                <input class="input" type="text" name="trello_auth_key" v-model.lazy="key"/>
-            </label>
-            <input class="button is-primary" type="submit" value="Connect" v-on:click="get_my_boards"/>
-        </div>
-        <div v-if="connected">
-            <p>Connected to Trello!</p>
-            <input class="button" type="submit" value="Disconnect" v-on:click="disconnect"/>
+            <div class="field">
+                <label class="label">
+                    Trello Token
+                    <input class="input" type="text" name="trello_auth_token" v-model.lazy="token"/>
+                </label>
+            </div>
+            <div class="field">
+                <label class="label">
+                    Trello Key
+                    <input class="input" type="text" name="trello_auth_key" v-model.lazy="key"/>
+                </label>
+            </div>
+            <button class="ui primary button" v-on:click="get_my_boards">Connect</button>
         </div>
     </div>
 </template>
@@ -45,9 +45,6 @@ export default {
   methods: {
     get_my_boards () {
       this.$store.dispatch('get_my_boards')
-    },
-    disconnect () {
-      this.$store.commit('set_connection_state', false)
     }
   }
 }
