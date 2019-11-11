@@ -1,16 +1,18 @@
 <template>
-  <div id="app">
-    <TrelloAuth />
-    <BoardMultiSelect v-if="connected"/>
+  <div id="app" class="container">
+    <div class="level">
+        <TrelloAuth class="level-left"/>
+        <BoardMultiSelect class="level-right" v-if="connected"/>
+    </div>
 
     <div v-if="connected" id="cardlists">
-        <h2>Overdue ({{ cards_overdue.length }})</h2>
+        <h3 class="title">Overdue ({{ cards_overdue.length }})</h3>
         <CardList v-bind:cards="cards_overdue"/>
 
-        <h2>Due ({{ cards_due.length }})</h2>
+        <h3 class="title">Due ({{ cards_due.length }})</h3>
         <CardList v-bind:cards="cards_due"/>
 
-        <h2>Not scheduled</h2>
+        <h3 class="title">Not scheduled</h3>
         <CardList v-bind:cards="cards_not_scheduled"/>
     </div>
   </div>
@@ -53,12 +55,7 @@ export default {
     width: 100%;
 }
 #trello_auth {
-    float: left;
 }
 #board_multi_select {
-    float: right;
-}
-#cardlists {
-    clear: both;
 }
 </style>

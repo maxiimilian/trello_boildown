@@ -1,8 +1,9 @@
 <template>
-    <div class="card">
-        {{ board.name }}<br />
-        {{ card.name }}<br />
-        <span v-if="card.due !== null">Due: {{ due }}</span>
+    <div class="card box">
+        <span class="tag">{{ board.name }}</span><br />
+        <p class="is-medium">{{ card.name }}</p>
+        <span v-if="card.due !== null">Due: {{ due }}</span><br />
+        <a :href="card.shortUrl" target="_blank">Link</a>
     </div>
 </template>
 
@@ -22,7 +23,6 @@ export default {
 
 <style>
 .card {
-    border: 1px solid grey;
     padding: 6px;
 }
 </style>

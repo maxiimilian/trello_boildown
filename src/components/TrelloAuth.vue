@@ -1,19 +1,19 @@
 <template>
     <div id="trello_auth">
         <div v-if="!connected">
-            <label>
+            <label class="label">
                 Trello Token
-                <input type="text" name="trello_auth_token" v-model.lazy="token"/>
-            </label><br />
-            <label>
+                <input class="input" type="text" name="trello_auth_token" v-model.lazy="token"/>
+            </label>
+            <label class="label">
                 Trello Key
-                <input type="text" name="trello_auth_key" v-model.lazy="key"/>
-            </label><br />
-            <input type="submit" value="Connect" v-on:click="get_my_boards"/>
+                <input class="input" type="text" name="trello_auth_key" v-model.lazy="key"/>
+            </label>
+            <input class="button is-primary" type="submit" value="Connect" v-on:click="get_my_boards"/>
         </div>
         <div v-if="connected">
             <p>Connected to Trello!</p>
-            <input type="submit" value="Disconnect" v-on:click="disconnect"/>
+            <input class="button" type="submit" value="Disconnect" v-on:click="disconnect"/>
         </div>
     </div>
 </template>

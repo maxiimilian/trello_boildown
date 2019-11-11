@@ -1,9 +1,15 @@
 <template>
     <div id="board_multi_select">
-        <select multiple v-model="boards_selected">
-            <option v-for="b in boards" v-bind:key="b.id" v-bind:value="b.id">{{ b.name }}</option>
-        </select>
-        <input type="submit" v-on:click="reload" value="Reload" /><br />
+        <div class="field has-addon">
+        <div class="select is-multiple is-small">
+          <select multiple v-model="boards_selected">
+              <option v-for="b in boards" v-bind:key="b.id" v-bind:value="b.id">{{ b.name }}</option>
+          </select>
+        </div>
+        <div class="control">
+            <input class="button" type="submit" v-on:click="reload" value="Reload" />
+        </div>
+        </div>
         <span>Last refresh: {{ last_refresh }}</span>
     </div>
 </template>

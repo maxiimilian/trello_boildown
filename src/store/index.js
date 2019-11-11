@@ -64,7 +64,7 @@ export default new Vuex.Store({
         if (!boards_selected_new.includes(board_id)) {
           // Remove all cards associated with de-selected board
           this.commit('remove_cards', board_id)
-          console.log(`${board_id} was de-selected`)
+          // console.log(`${board_id} was de-selected`)
         }
       })
       state.boards_selected = boards_selected_new
@@ -117,7 +117,7 @@ export default new Vuex.Store({
           params: {
             key: context.state.trello_auth.key,
             token: context.state.trello_auth.token,
-            fields: 'name,dueComplete,due,isTemplate',
+            fields: 'name,dueComplete,due,isTemplate,shortUrl',
             filter: 'open'
           }
         }).then(response => {
