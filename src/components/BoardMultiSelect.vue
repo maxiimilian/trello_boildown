@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     reload () {
-      console.log('Reload triggered')
+      // console.log('Reload triggered')
       this.$store.dispatch('get_cards')
     }
   },

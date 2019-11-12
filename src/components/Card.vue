@@ -7,7 +7,7 @@
         </div>
         <div class="extra content">
             <div class="left floated">
-                <div class="ui label" v-bind:class="due_color" v-if="card.due !== null">{{ due }}</div>
+                <div v-if="card.due !== null" class="ui label due" v-bind:class="due_color" v-bind:data-tooltip="due.tooltip" data-position="top left" data-inverted="">{{ due.short }}</div>
             </div>
             <div class="right floated">
                 <a :href="card.shortUrl" target="_blank"><i class="external square alternate icon"></i></a>
@@ -24,7 +24,18 @@ export default {
   props: ['card', 'board'],
   computed: {
     due () {
-      return moment(this.card.due).fromNow()
+      let due = moment(this.card.due)
+      return {
+        short: due.calendar(null, {
+          sameDay: '[Today]',
+          nextDay: '[Tomorrow]',
+          nextWeek: 'dddd',
+          lastDay: '[Yesterday]',
+          lastWeek: '[Last] dddd',
+          sameElse: 'DD.MM.YY'
+        }),
+        tooltip: due.format('DD.MM.YY, HH:mm')
+      }
     },
     due_color () {
       if (this.card.due < moment().startOf('day')) {
@@ -41,5 +52,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.due {
+    cursor: pointer;
+}
 </style>
