@@ -38,14 +38,22 @@ export default {
       }
     },
     due_color () {
-      if (this.card.due < moment().startOf('day')) {
+      // It is required for `tomorrow` to call moment() on `today` to get a cloned object!
+      let due = moment(this.card.due)
+      let today = moment().startOf('day')
+      let tomorrow = moment(today).add(1, 'days')
+
+      if (due.isBefore(today)) {
         // overdue
         return 'red'
-      }
-      if (this.card.due >= moment().startOf('day') && this.card.due < moment().endOf('day')) {
+      } else if (due.isBetween(today, tomorrow)) {
         // today
         return 'yellow'
+      } else if (due.isBetween(tomorrow, moment(tomorrow).endOf('day'))) {
+        // tomorrow
+        return 'tomorrow'
       }
+
       return ''
     }
   }
@@ -55,5 +63,9 @@ export default {
 <style scoped>
 .due {
     cursor: pointer;
+}
+.tomorrow {
+    background-color: #d3e6f1!important;
+    border-color: #d3e6f1!important;
 }
 </style>

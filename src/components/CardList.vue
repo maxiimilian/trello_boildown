@@ -23,7 +23,7 @@ export default {
     Card
   },
   props: {
-    cards: Object,
+    cards: Array,
     header: String,
     initially_collapsed: {
       type: Boolean,
