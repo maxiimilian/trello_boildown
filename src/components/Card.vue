@@ -65,7 +65,7 @@ export default {
     cursor: pointer;
 }
 .tomorrow {
-    background-color: #d3e6f1!important;
-    border-color: #d3e6f1!important;
+    background-color: #f7eddc!important;
+    border-color: #f7eddc!important;
 }
 </style>
