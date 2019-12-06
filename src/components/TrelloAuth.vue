@@ -1,20 +1,18 @@
 <template>
     <div id="trello_auth" class="ui form">
-        <div v-if="!connected">
-            <div class="field">
-                <label class="label">
-                    Trello Token
-                    <input class="input" type="text" name="trello_auth_token" v-model.lazy="token"/>
-                </label>
-            </div>
-            <div class="field">
-                <label class="label">
-                    Trello Key
-                    <input class="input" type="text" name="trello_auth_key" v-model.lazy="key"/>
-                </label>
-            </div>
-            <button class="ui primary button" v-on:click="get_my_boards">Connect</button>
+        <div class="field">
+            <label class="label">
+                Trello Token
+                <input class="input" type="text" name="trello_auth_token" v-model.lazy="token"/>
+            </label>
         </div>
+        <div class="field">
+            <label class="label">
+                Trello Key
+                <input class="input" type="text" name="trello_auth_key" v-model.lazy="key"/>
+            </label>
+        </div>
+        <button class="ui primary button" v-on:click="get_my_boards">Connect</button>
     </div>
 </template>
 
