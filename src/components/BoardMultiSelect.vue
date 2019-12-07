@@ -8,7 +8,7 @@
                 </select>
             </label>
         </div>
-        <button class="ui primary button" v-on:click="reload">Reload</button>
+        <button class="ui primary button" :class="loading ? 'loading disabled': ''" v-on:click="reload" >Reload</button>
         <span>Last refresh: {{ last_refresh }}</span>
     </div>
 </template>
@@ -19,7 +19,9 @@ import moment from 'moment'
 export default {
   name: 'BoardMultiSelect',
   data: function () {
-    return {}
+    return {
+      'loading': false
+    }
   },
   computed: {
     boards () {
@@ -45,7 +47,10 @@ export default {
   methods: {
     reload () {
       // console.log('Reload triggered')
-      this.$store.dispatch('get_cards')
+      this.loading = true
+      this.$store.dispatch('get_cards').then(() => {
+        this.loading = false
+      })
     }
   },
   created () {
