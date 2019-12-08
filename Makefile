@@ -6,3 +6,6 @@ dist:
 	tar cf dist.tar dist/ docker-compose.prod.yml 
 	scp dist.tar storage:~
 	rm dist.tar
+
+dev:
+	docker-compose up
