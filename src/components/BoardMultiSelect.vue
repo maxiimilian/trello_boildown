@@ -39,20 +39,12 @@ export default {
   },
   methods: {
     reload () {
-      // console.log('Reload triggered')
       this.loading = true
       this.$store.dispatch('get_cards').then(() => {
         this.loading = false
         this.last_refresh = moment().format('HH:mm')
       })
     }
-  },
-  created () {
-    this.reload()
   }
 }
 </script>
-
-<style scoped>
-
-</style>

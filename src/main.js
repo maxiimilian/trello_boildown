@@ -19,14 +19,14 @@ new Vue({
   router,
   render: h => h(App),
   beforeCreate () {
+    // Load data from local storage into store
     this.$store.commit('init_store')
   },
   created () {
+    // Populate boards and get cards, if key and token are set.
     if (this.$store.state.trello_auth.key !== '' && this.$store.state.trello_auth.token !== '') {
       this.$store.dispatch('get_my_boards').then(() => {
-        if (this.$store.state.trello_auth.connected && this.$store.state.boards_selected !== []) {
-          this.$store.dispatch('get_cards')
-        }
+        this.$store.dispatch('get_cards')
       })
     }
   }

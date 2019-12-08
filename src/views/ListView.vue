@@ -2,7 +2,7 @@
     <div v-if="connected" id="list">
         <CardList header="Overdue" v-bind:cards="cards_overdue" initially_collapsed/>
         <CardList header="Due" v-bind:cards="cards_due"/>
-        <CardList header="Not Scheduled" v-bind:cards="cards_not_scheduled"/>
+        <CardList header="Not Scheduled" v-bind:cards="cards_not_scheduled" initially_collapsed/>
     </div>
 </template>
 

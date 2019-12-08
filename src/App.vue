@@ -1,17 +1,30 @@
 <template>
   <div id="app" class="ui container">
-    <div id="header">
-        <h1 class="ui header left floated">Trello Boildown</h1>
-        <button class="ui negative button right floated" v-on:click="disconnect">Disconnect</button>
-    </div>
-    <router-link to="/list">List</router-link>
-    <router-link to="/week">Week</router-link>
-    <div class="ui clearing divider"></div>
+    <div id="header" class="ui stackable grid">
+        <div class="five wide column">
+            <h1 class="ui header">Trello Boildown</h1>
+        </div>
+        <div class="eleven wide column" v-if="connected">
+            <div class="ui secondary menu">
+                <router-link to="/list" class="item">List</router-link>
+                <router-link to="/week" class="item">Week</router-link>
 
-    <div>
-        <BoardMultiSelect v-if="connected"/>
+                <div class="right menu">
+                    <button class="ui icon button" v-on:click="toggle_settings()" v-bind:class="settings_open ? 'active': ''"><i class="cog icon"></i></button>
+                    <button class="ui negative button" v-on:click="disconnect">Disconnect</button>
+
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="ui clearing divider"></div>
+    <div class="ui divider"></div>
+
+    <div id="settings" v-if="settings_open">
+        <button class="ui right floated icon mini button" v-on:click="toggle_settings()"><i class="close icon" ></i></button>
+
+        <BoardMultiSelect v-if="connected"/>
+        <div class="ui clearing divider"></div>
+    </div>
 
     <router-view></router-view>
 
@@ -34,6 +47,15 @@ export default {
   methods: {
     disconnect () {
       this.$store.commit('set_connection_state', false)
+      this.$router.push('auth')
+    },
+    toggle_settings () {
+      this.settings_open = !this.settings_open
+    }
+  },
+  data () {
+    return {
+      settings_open: false
     }
   }
 }

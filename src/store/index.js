@@ -110,7 +110,11 @@ export default new Vuex.Store({
   },
   actions: {
     get_my_boards (context) {
-      trelloAPI.get('members/me/boards', {
+      /*
+       * Get list of boards from Trello.
+       * Return Promise to allow error handling outside of action
+       */
+      return trelloAPI.get('members/me/boards', {
         params: {
           key: context.state.trello_auth.key,
           token: context.state.trello_auth.token,

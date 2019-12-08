@@ -42,7 +42,9 @@ export default {
   },
   methods: {
     get_my_boards () {
-      this.$store.dispatch('get_my_boards')
+      this.$store.dispatch('get_my_boards').then(() => {
+        this.$router.push('list')
+      })
     }
   }
 }
