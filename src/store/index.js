@@ -94,8 +94,6 @@ export default new Vuex.Store({
       // Update all common keys of existing card with new values
       for (let key in card) {
         if (key in updated_card) {
-          console.log(card[key])
-          console.log(updated_card[key])
           card[key] = updated_card[key]
         }
       }
@@ -165,7 +163,6 @@ export default new Vuex.Store({
        * Update a card in Trello and update local cards array.
        * Data have to be ready for Trello!
        */
-      console.log(card_id)
       // Use return to catch potential errors in api call
       return trelloAPI.put(`cards/${card_id}`, {
         key: context.state.trello_auth.key,
