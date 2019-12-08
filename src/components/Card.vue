@@ -1,7 +1,7 @@
 <template>
     <div class="ui card">
         <div class="content">
-            <div class="right floated meta"><StatusIndicator :status="status"></StatusIndicator></div>
+            <div class="right floated meta"><StatusIndicator :status="status" :msg="status_msg"></StatusIndicator></div>
             <div class="header"><a :href="card.shortUrl" target="_blank">{{ card.name }}</a></div>
             <div class="meta"><a :href="board.shortUrl" target="_blank">{{ board.name }}</a></div>
         </div>
@@ -65,7 +65,8 @@ export default {
   },
   data () {
     return {
-      'status': 'hidden'
+      'status': 'hidden',
+      'status_msg': ''
     }
   },
   methods: {
@@ -74,6 +75,25 @@ export default {
 
       let new_due = moment(this.card.due).add(days, 'days')
       console.log(new_due.toISOString())
+
+      this.$store.dispatch('update_card', {
+        card_id: this.card.id,
+        data: {
+          due: new_due.toISOString()
+        }
+      }).then(() => {
+        this.status = 'ok'
+        this.status_msg = ''
+
+        // Hide successful indicator after 2 seconds
+        setTimeout(() => {
+          this.status = 'hidden'
+        }, 2000)
+      }).catch(e => {
+        // Display error
+        this.status = 'error'
+        this.status_msg = e.message
+      })
     }
   }
 }

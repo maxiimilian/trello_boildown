@@ -1,14 +1,46 @@
 <template>
     <div>
-        <i v-if="status == 'ok'" style="color: green;" class="check circle icon"></i>
-        <i v-if="status == 'loading'" class="notched circle loading icon"></i>
-        <i v-if="status == 'error'" style="color: red;" class="exclamation circle icon"></i>
+        <div
+            class="status"
+            v-if="status == 'ok'"
+        >
+            <i class="check circle icon" style="color: green;"></i>
+        </div>
+
+        <div
+            class="status"
+            v-if="status == 'loading'"
+        >
+            <i class="notched circle loading icon"></i>
+        </div>
+
+        <div
+            class="status"
+            v-if="status == 'error'"
+            v-bind:data-tooltip="msg"
+            data-position="bottom right"
+            data-inverted=""
+        >
+            <i class="exclamation circle icon" style="color: red;"></i>
+        </div>
     </div>
 </template>
 
 <script>
 export default {
   name: 'StatusIndicator',
-  props: ['status']
+  props: {
+    status: String,
+    msg: {
+      type: String,
+      default: ''
+    }
+  }
 }
 </script>
+
+<style scoped>
+div.status {
+    cursor: pointer;
+}
+</style>

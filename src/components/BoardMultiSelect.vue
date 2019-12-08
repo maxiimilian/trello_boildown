@@ -20,7 +20,8 @@ export default {
   name: 'BoardMultiSelect',
   data: function () {
     return {
-      'loading': false
+      'loading': false,
+      'last_refresh': 'Never'
     }
   },
   computed: {
@@ -34,14 +35,6 @@ export default {
       set (value) {
         this.$store.commit('set_boards_selected', value)
       }
-    },
-    last_refresh () {
-      let last_refresh = this.$store.state.last_refresh
-      if (last_refresh === null) {
-        return 'Never'
-      } else {
-        return moment(last_refresh).format('HH:mm')
-      }
     }
   },
   methods: {
@@ -50,6 +43,7 @@ export default {
       this.loading = true
       this.$store.dispatch('get_cards').then(() => {
         this.loading = false
+        this.last_refresh = moment().format('HH:mm')
       })
     }
   },

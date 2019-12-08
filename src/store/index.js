@@ -30,7 +30,6 @@ export default new Vuex.Store({
     boards: {},
     boards_selected: [],
     cards: [],
-    last_refresh: null,
     trello_auth: {
       key: '',
       token: '',
@@ -87,8 +86,28 @@ export default new Vuex.Store({
 
       state.cards = cards_new
     },
-    set_last_refresh (state) {
-      state.last_refresh = new Date()
+    update_card (state, updated_card) {
+      // Find old card by card id
+      let card_index = state.cards.findIndex(c => c.id === updated_card.id)
+      let card = state.cards[card_index]
+
+      // Update all common keys of existing card with new values
+      for (let key in card) {
+        if (key in updated_card) {
+          console.log(card[key])
+          console.log(updated_card[key])
+          card[key] = updated_card[key]
+        }
+      }
+
+      // @todo: Duplicate behavior here and in get_cards action
+      // convert due date to time object
+      if (card.due !== null) {
+        card['due'] = new Date(card.due)
+      }
+
+      // Move updated card back to cards array
+      state.cards[card_index] = card
     }
   },
   actions: {
@@ -126,6 +145,7 @@ export default new Vuex.Store({
           // Process each card
           response.data.forEach(c => {
             // Only process cards which are not yet completed
+            // @todo: Duplicate behavior here and in update_card mutation
             if (!c.dueComplete && !c.isTemplate) {
               c['board_id'] = board_id
               if (c.due !== null) {
@@ -137,8 +157,23 @@ export default new Vuex.Store({
           })
 
           context.commit('add_cards', cards)
-          context.commit('set_last_refresh')
         })
+      })
+    },
+    update_card (context, { card_id, data }) {
+      /*
+       * Update a card in Trello and update local cards array.
+       * Data have to be ready for Trello!
+       */
+      console.log(card_id)
+      // Use return to catch potential errors in api call
+      return trelloAPI.put(`cards/${card_id}`, {
+        key: context.state.trello_auth.key,
+        token: context.state.trello_auth.token,
+        ...data
+      }).then(response => {
+        // Trello returns updated card. Save to app's store.
+        context.commit('update_card', response.data)
       })
     }
   },
