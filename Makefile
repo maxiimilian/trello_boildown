@@ -9,3 +9,6 @@ dist:
 
 dev:
 	docker-compose up
+
+shell:
+	docker-compose run --rm dev /bin/bash
