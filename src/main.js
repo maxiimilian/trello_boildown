@@ -9,6 +9,7 @@ import router from './router'
 
 import '../public/css/normalize.css'
 import '../public/libs/semantic-ui/semantic.min.css'
+import './registerServiceWorker'
 
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
