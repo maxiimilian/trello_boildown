@@ -6,8 +6,8 @@
         </div>
         <div class="eleven wide column" v-if="connected">
             <div class="ui secondary menu">
-                <router-link to="/list" class="item">List</router-link>
-                <router-link to="/week" class="item">Week</router-link>
+                <router-link to="/list" class="item" active-class="active">List</router-link>
+                <router-link to="/week" class="item" active-class="active">Week</router-link>
 
                 <div class="right menu">
                     <button class="ui icon button" v-on:click="toggle_settings()" v-bind:class="settings_open ? 'active': ''"><i class="cog icon"></i></button>
