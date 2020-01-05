@@ -1,6 +1,12 @@
 <template>
-    <div class="scrolling week">
-        <CardListDay class="ui cards scrolling day" v-for="i in 7" v-bind:key="i" v-bind:dow="i-1"/>
+    <div>
+        <button class="ui button left floated" v-on:click="week--">Prev </button>
+        <button class="ui button right floated" v-on:click="week++">Next</button>
+        <div style="clear: both;"></div>
+
+        <div class="scrolling week">
+            <CardListDay class="ui cards scrolling day" v-for="dow in dow_array" v-bind:key="dow" v-bind:dow="dow"/>
+        </div>
     </div>
 </template>
 
@@ -11,6 +17,21 @@ export default {
   name: 'WeekView',
   components: {
     CardListDay
+  },
+  data () {
+    return {
+      week: 0
+    }
+  },
+  computed: {
+    dow_array () {
+      let dows = []
+      for (let i = 0; i < 7; i++) {
+        dows.push(this.week * 7 + i)
+      }
+
+      return dows
+    }
   }
 }
 </script>

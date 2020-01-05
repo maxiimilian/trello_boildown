@@ -1,6 +1,7 @@
 <template>
     <div v-bind:id="dow">
-        {{ dow_moment.format('dd, DD.MM.') }}
+        <strong v-if="is_today">{{ dow_moment.format('dd, DD.MM.') }}</strong>
+        <span v-if="!is_today">{{ dow_moment.format('dd, DD.MM.') }}</span>
         <Card v-for="c in cards" v-bind:key="c.id" v-bind:card="c" v-bind:board="boards[c.board_id]"/>
     </div>
 </template>
@@ -28,8 +29,10 @@ export default {
     }
   },
   data () {
+    let dow_moment = moment().locale('de').weekday(this.dow)
     return {
-      dow_moment: moment().weekday(this.dow)
+      dow_moment: dow_moment,
+      is_today: moment().isSame(dow_moment, 'day')
     }
   }
 }
