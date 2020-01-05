@@ -16,21 +16,13 @@ function require_auth (to, from, next) {
 }
 
 const router = new VueRouter({
-  mode: 'history',
   routes: [
     { path: '/', redirect: '/list' },
     { path: '/list', component: ListView, beforeEnter: require_auth },
     { path: '/week', component: WeekView, beforeEnter: require_auth },
     { path: '/auth', component: AuthView },
     { path: '*', component: Error404View }
-  ],
-  scrollBehavior (to, from, savedPosition) {
-    if (to.hash) {
-      return { selector: to.hash }
-    } else {
-      return { x: 0, y: 0 }
-    }
-  }
+  ]
 })
 
 export default router
