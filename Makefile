@@ -6,7 +6,7 @@ dist:
 	# Save information about branch and commit into dist package
 	git rev-parse --short HEAD > commit.txt
 	git rev-parse --abbrev-ref HEAD >> commit.txt
-	tar cf dist.tar dist/ docker-compose.prod.yml 
+	tar cf dist.tar dist/ docker-compose.prod.yml commit.txt
 	scp dist.tar storage:~
 	rm dist.tar
 
