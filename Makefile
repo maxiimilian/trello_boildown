@@ -3,6 +3,9 @@ npm = docker-compose run --rm dev npm
 
 dist:
 	$(npm) run-script build
+	# Save information about branch and commit into dist package
+	git rev-parse --short HEAD > commit.txt
+	git rev-parse --abbrev-ref HEAD >> commit.txt
 	tar cf dist.tar dist/ docker-compose.prod.yml 
 	scp dist.tar storage:~
 	rm dist.tar
