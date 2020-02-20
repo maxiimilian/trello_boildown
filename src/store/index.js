@@ -119,7 +119,8 @@ export default new Vuex.Store({
           key: context.state.trello_auth.key,
           token: context.state.trello_auth.token,
           fields: 'name,shortUrl',
-          filter: 'open'
+          filter: 'open',
+          lists: 'open'
         }
       }).then(response => {
         context.commit('set_connection_state', true)
@@ -129,6 +130,7 @@ export default new Vuex.Store({
         response.data.forEach(b => {
           boards[b.id] = b
         })
+
         context.commit('set_boards', boards)
       })
     },
