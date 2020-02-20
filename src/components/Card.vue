@@ -40,7 +40,7 @@ export default {
           lastWeek: '[Last] dddd',
           sameElse: 'DD.MM.YY'
         }),
-        tooltip: due.format('DD.MM.YY, HH:mm')
+        tooltip: due.format('dd, DD.MM.YY, HH:mm')
       }
     },
     due_color () {
@@ -61,6 +61,28 @@ export default {
       }
 
       return ''
+    },
+    list_backlog_id () {
+      let backlog = this.board.lists.find(l => l.name === 'Backlog')
+      if (backlog === undefined) {
+        return false
+      }
+      return backlog.id
+    },
+    list_week_id () {
+      let week = this.board.lists.find(l => l.name === 'Week')
+      if (week === undefined) {
+        return false
+      }
+      return week.id
+    },
+    advanced_rescheduling () {
+      /*
+      True, if a card is capable of advanced rescheduling.
+      That means, Week and Backlog columns are present and card is moved
+      to correct column on rescheduling
+      */
+      return self.list_week_id !== false && self.list_backlog_id !== false
     }
   },
   data () {
@@ -74,12 +96,22 @@ export default {
       this.status = 'loading'
 
       let new_due = moment(this.card.due).add(days, 'days')
+      let data = {
+        due: new_due.toISOString()
+      }
+
+      // Advanced rescheduling is available if Week and Backlog column are defined
+      if (this.advanced_rescheduling) {
+        if (moment().week() !== new_due.week()) {
+          data['idList'] = this.list_backlog_id
+        } else {
+          data['idList'] = this.list_week_id
+        }
+      }
 
       this.$store.dispatch('update_card', {
         card_id: this.card.id,
-        data: {
-          due: new_due.toISOString()
-        }
+        data: data
       }).then(() => {
         this.status = 'ok'
         this.status_msg = ''
