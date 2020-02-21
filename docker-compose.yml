@@ -4,9 +4,8 @@ services:
     dev:
         build: .
         volumes:
-            - .:/usr/src/service
+          - .:/usr/src/service:cached
         working_dir: /usr/src/service
         command: npm run serve
         ports:
             - 8080:8080
-            #- 1235:1235
