@@ -10,9 +10,9 @@
                 <div v-if="card.due !== null" class="ui label due" v-bind:class="due_color" v-bind:data-tooltip="due.tooltip" data-position="top left" data-inverted="">{{ due.short }}</div>
             </div>
             <div class="right floated">
-                <a v-on:click="reschedule(1)" class="reschedule_button">+1d</a>
-                <a v-on:click="reschedule(2)" class="reschedule_button">+2d</a>
-                <a v-on:click="reschedule(7)" class="reschedule_button">+1w</a>
+                <a v-on:click="reschedule(1)" v-bind:data-tooltip="get_reschedule_tooltip(1)" data-position="top right" data-inverted="" class="reschedule_button">+1d</a>
+                <a v-on:click="reschedule(2)" v-bind:data-tooltip="get_reschedule_tooltip(2)" data-position="top right" data-inverted="" class="reschedule_button">+2d</a>
+                <a v-on:click="reschedule(7)" v-bind:data-tooltip="get_reschedule_tooltip(7)" data-position="top right" data-inverted="" class="reschedule_button">+1w</a>
             </div>
         </div>
     </div>
@@ -101,7 +101,8 @@ export default {
       }
 
       // Advanced rescheduling is available if Week and Backlog column are defined
-      if (this.advanced_rescheduling) {
+      // Only move column if new due date is after now.
+      if (this.advanced_rescheduling && new_due.isAfter()) {
         if (moment().week() !== new_due.week()) {
           data['idList'] = this.list_backlog_id
         } else {
@@ -125,6 +126,10 @@ export default {
         this.status = 'error'
         this.status_msg = e.message
       })
+    },
+    get_reschedule_tooltip (days) {
+      let new_due = moment(this.card.due).add(days, 'days')
+      return new_due.format('dd, DD.MM.')
     }
   }
 }
