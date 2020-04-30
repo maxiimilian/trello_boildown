@@ -1,7 +1,10 @@
 <template>
     <div class="ui card">
         <div class="content">
-            <div class="right floated meta"><StatusIndicator :status="status" :msg="status_msg"/></div>
+            <div class="right floated meta">
+              <StatusIndicator :status="status" :msg="status_msg"/>
+              <Completer v-on:completed="mark_completed()" v-if="status == 'hidden'"></Completer>
+            </div>
             <div class="header"><a :href="card.shortUrl" target="_blank">{{ card.name }}</a></div>
             <div class="meta"><a :href="board.shortUrl" target="_blank">{{ board.name }}</a></div>
         </div>
@@ -21,12 +24,14 @@
 <script>
 import moment from 'moment'
 import StatusIndicator from './StatusIndicator'
+import Completer from './Completer'
 
 export default {
   name: 'Card',
   props: ['card', 'board'],
   components: {
-    StatusIndicator
+    StatusIndicator,
+    Completer
   },
   computed: {
     due () {
@@ -76,6 +81,13 @@ export default {
       }
       return week.id
     },
+    list_completed_id () {
+      let completed = this.board.lists.find(l => l.name === 'Completed')
+      if (completed === undefined) {
+        return false
+      }
+      return completed.id
+    },
     advanced_rescheduling () {
       /*
       True, if a card is capable of advanced rescheduling.
@@ -93,8 +105,6 @@ export default {
   },
   methods: {
     reschedule (days) {
-      this.status = 'loading'
-
       let new_due = moment(this.card.due).add(days, 'days')
       let data = {
         due: new_due.toISOString()
@@ -110,6 +120,33 @@ export default {
         }
       }
 
+      this.update_card(data)
+    },
+    mark_completed () {
+      // Set current time and date as due date and mark as completed
+      let data = {
+        due: moment().toISOString(),
+        dueComplete: true
+      }
+
+      // If available, move to the top of list `completed`
+      if (this.list_completed_id) {
+        data['idList'] = this.list_completed_id
+        data['pos'] = 'top'
+      }
+
+      // Trigger update
+      this.update_card(data)
+    },
+    get_reschedule_tooltip (days) {
+      let new_due = moment(this.card.due).add(days, 'days')
+      return new_due.format('dd, DD.MM.')
+    },
+    update_card (data) {
+      // Set status indicator to loading
+      this.status = 'loading'
+
+      // Dispatch to store which triggers api
       this.$store.dispatch('update_card', {
         card_id: this.card.id,
         data: data
@@ -126,10 +163,6 @@ export default {
         this.status = 'error'
         this.status_msg = e.message
       })
-    },
-    get_reschedule_tooltip (days) {
-      let new_due = moment(this.card.due).add(days, 'days')
-      return new_due.format('dd, DD.MM.')
     }
   }
 }
