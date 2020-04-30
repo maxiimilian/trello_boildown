@@ -19,6 +19,11 @@ export default {
       // Needs to be called twice to trigger `completed` event
       if (this.click_counter < 1) {
         this.click_counter += 1
+
+        // Set timeout to reset click counter if no further click occurs
+        setTimeout(() => {
+          this.click_counter = 0
+        }, 2000)
       } else {
         this.$emit('completed')
         this.click_counter = 0
