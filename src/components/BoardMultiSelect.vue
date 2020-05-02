@@ -40,7 +40,7 @@ export default {
   methods: {
     reload () {
       this.loading = true
-      this.$store.dispatch('get_cards').then(() => {
+      this.$store.dispatch('reload').then(() => {
         this.loading = false
         this.last_refresh = moment().format('HH:mm')
       })

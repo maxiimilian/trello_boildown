@@ -8,6 +8,7 @@
 
 <script>
 import CardList from '../components/CardList.vue'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'ListView',
@@ -15,18 +16,14 @@ export default {
     CardList
   },
   computed: {
-    connected () {
-      return this.$store.state.trello_auth.connected
-    },
-    cards_not_scheduled () {
-      return this.$store.getters.cards_not_scheduled
-    },
-    cards_overdue () {
-      return this.$store.getters.cards_overdue
-    },
-    cards_due () {
-      return this.$store.getters.cards_due
-    }
+    ...mapState({
+      'connected': state => state.trello_auth.connected
+    }),
+    ...mapGetters([
+      'cards_due',
+      'cards_overdue',
+      'cards_not_scheduled'
+    ])
   }
 
 }

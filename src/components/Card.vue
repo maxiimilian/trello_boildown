@@ -135,8 +135,10 @@ export default {
         data['pos'] = 'top'
       }
 
-      // Trigger update
-      this.update_card(data)
+      // Trigger update and then reload
+      this.update_card(data).then(() => {
+        this.$store.dispatch('reload')
+      })
     },
     get_reschedule_tooltip (days) {
       let new_due = moment(this.card.due).add(days, 'days')
@@ -147,7 +149,7 @@ export default {
       this.status = 'loading'
 
       // Dispatch to store which triggers api
-      this.$store.dispatch('update_card', {
+      return this.$store.dispatch('update_card', {
         card_id: this.card.id,
         data: data
       }).then(() => {

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import moment from 'moment'
 
 Vue.use(Vuex)
 
@@ -34,7 +35,9 @@ export default new Vuex.Store({
       key: '',
       token: '',
       connected: false
-    }
+    },
+    last_refreshed: undefined,
+    cards_loading: false
   },
   mutations: {
     init_store (state) {
@@ -68,23 +71,22 @@ export default new Vuex.Store({
       })
       state.boards_selected = boards_selected_new
     },
+    set_last_refreshed (state, value) {
+      state.last_refreshed = value
+    },
+    set_cards_loading (state, value) {
+      state.cards_loading = value
+    },
     remove_cards (state, board_id) {
       /* Remove cards for board_id */
       state.cards = state.cards.filter(c => c.board_id !== board_id)
     },
-    add_cards (state, cards) {
-      // Get only ids of new cards
-      let cards_new_ids = []
-      cards.forEach(c => cards_new_ids.push(c.id))
-
-      // Create new cards array but exclude "old" cards with same id as new cards
-      let cards_new = [
-        // Filter: return cards with ids NOT in cards_new_ids array
-        ...state.cards.filter(c => !cards_new_ids.includes(c.id)),
+    add_cards (state, { cards, board_id }) {
+      /* Keep all cards not belonging to `board_id` and add all `cards` passed */
+      state.cards = [
+        ...state.cards.filter(c => c.board_id !== board_id),
         ...cards
       ]
-
-      state.cards = cards_new
     },
     update_card (state, updated_card) {
       // Find old card by card id
@@ -135,33 +137,51 @@ export default new Vuex.Store({
       })
     },
     get_cards (context) {
+      // Triggers loading indicators
+      context.commit('set_cards_loading', true)
+
+      // Store all api promises
+      let api_promises = []
+
+      // Fetch cards from all selected boards
       context.state.boards_selected.forEach(board_id => {
-        trelloAPI.get(`boards/${board_id}/cards`, {
-          params: {
-            key: context.state.trello_auth.key,
-            token: context.state.trello_auth.token,
-            fields: 'name,dueComplete,due,isTemplate,shortUrl',
-            filter: 'open'
-          }
-        }).then(response => {
-          let cards = []
-
-          // Process each card
-          response.data.forEach(c => {
-            // Only process cards which are not yet completed
-            // @todo: Duplicate behavior here and in update_card mutation
-            if (!c.dueComplete && !c.isTemplate) {
-              c['board_id'] = board_id
-              if (c.due !== null) {
-                c['due'] = new Date(c.due)
-              }
-
-              cards.push(c)
+        api_promises.push(
+          trelloAPI.get(`boards/${board_id}/cards`, {
+            params: {
+              key: context.state.trello_auth.key,
+              token: context.state.trello_auth.token,
+              fields: 'name,dueComplete,due,isTemplate,shortUrl',
+              filter: 'open'
             }
-          })
+          }).then(response => {
+            let cards = []
 
-          context.commit('add_cards', cards)
-        })
+            // Process each card
+            response.data.forEach(c => {
+              // Only process cards which are not yet completed
+              // @todo: Duplicate behavior here and in update_card mutation
+              if (!c.dueComplete && !c.isTemplate) {
+                c['board_id'] = board_id
+                if (c.due !== null) {
+                  c['due'] = new Date(c.due)
+                }
+
+                cards.push(c)
+              }
+            })
+
+            context.commit('add_cards', {
+              cards: cards,
+              board_id: board_id
+            })
+          })
+        )
+      })
+
+      // Wait for all api promises to finish before setting `last_refreshed` and `loading`
+      Promise.all(api_promises).then(() => {
+        context.commit('set_last_refreshed', moment())
+        context.commit('set_cards_loading', false)
       })
     },
     update_card (context, { card_id, data }) {
@@ -178,9 +198,11 @@ export default new Vuex.Store({
         // Trello returns updated card. Save to app's store.
         context.commit('update_card', response.data)
       })
+    },
+    reload (context) {
+      /* Alias for get_cards. Added because maybe future requires specific reload action */
+      context.dispatch('get_cards')
     }
-  },
-  modules: {
   },
   getters: {
     cards_not_scheduled: state => {

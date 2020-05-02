@@ -12,8 +12,8 @@ dist:
 	git rev-parse --short HEAD > commit.txt
 	git rev-parse --abbrev-ref HEAD >> commit.txt
 	tar cf dist.tar dist/ docker-compose.prod.yml commit.txt
-	scp dist.tar storage:~
-	rm dist.tar
+	#scp dist.tar storage:~
+	#rm dist.tar
 
 # Run this before first use in new environment
 setup:
