@@ -20,6 +20,9 @@
 <script>
 import ErrorDisplay from '../components/ErrorDisplay.vue'
 
+import a from '../store/actions.js'
+import m from '../store/mutations.js'
+
 export default {
   name: 'AuthView',
   components: {
@@ -39,7 +42,7 @@ export default {
         return this.$store.state.trello_auth.token
       },
       set (value) {
-        this.$store.commit('set_auth_token', value)
+        this.$store.commit(m.SET_AUTH_TOKEN, value)
       }
     },
     key: {
@@ -47,13 +50,13 @@ export default {
         return this.$store.state.trello_auth.key
       },
       set (value) {
-        this.$store.commit('set_auth_key', value)
+        this.$store.commit(m.SET_AUTH_KEY, value)
       }
     }
   },
   methods: {
     get_my_boards () {
-      this.$store.dispatch('get_my_boards').then(() => {
+      this.$store.dispatch(a.GET_BOARDS).then(() => {
         this.errors = []
         this.$router.push('list')
       }).catch(e => {

@@ -38,6 +38,9 @@
 import moment from 'moment'
 import { mapState } from 'vuex'
 
+import a from './store/actions.js'
+import m from './store/mutations.js'
+
 import BoardMultiSelect from './components/BoardMultiSelect.vue'
 import Reload from './components/Reload.vue'
 
@@ -63,7 +66,7 @@ export default {
   },
   methods: {
     disconnect () {
-      this.$store.commit('set_connection_state', false)
+      this.$store.commit(m.SET_CONNECTION_STATE, false)
       this.$router.push('auth')
     },
     toggle_settings () {
@@ -74,7 +77,7 @@ export default {
       if (this.last_refreshed !== undefined) {
         let diff = moment().diff(this.last_refreshed, 'minutes', true)
         if (diff > 15) {
-          this.$store.dispatch('reload')
+          this.$store.dispatch(a.RELOAD)
         }
       }
     }

@@ -26,6 +26,8 @@ import moment from 'moment'
 import StatusIndicator from './StatusIndicator'
 import Completer from './Completer'
 
+import a from '../store/actions.js'
+
 export default {
   name: 'Card',
   props: ['card', 'board'],
@@ -137,7 +139,7 @@ export default {
 
       // Trigger update and then reload
       this.update_card(data).then(() => {
-        this.$store.dispatch('reload')
+        this.$store.dispatch(a.RELOAD)
       })
     },
     get_reschedule_tooltip (days) {
@@ -149,7 +151,7 @@ export default {
       this.status = 'loading'
 
       // Dispatch to store which triggers api
-      return this.$store.dispatch('update_card', {
+      return this.$store.dispatch(a.UPDATE_CARD, {
         card_id: this.card.id,
         data: data
       }).then(() => {

@@ -11,12 +11,13 @@
 
 <script>
 import { mapState } from 'vuex'
+import a from '../store/actions.js'
 
 export default {
   name: 'Reload',
   methods: {
     reload () {
-      this.$store.dispatch('reload')
+      this.$store.dispatch(a.RELOAD)
     }
   },
   computed: {

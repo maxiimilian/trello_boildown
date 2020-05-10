@@ -3,6 +3,9 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import moment from 'moment'
 
+import m from './mutations.js'
+import a from './actions.js'
+
 Vue.use(Vuex)
 
 const trelloAPI = axios.create({
@@ -41,7 +44,7 @@ export default new Vuex.Store({
     cards_loading: false
   },
   mutations: {
-    init_store (state) {
+    [m.INIT_STORE] (state) {
       /* Init store from localStorage if present */
       if (localStorage.getItem('store')) {
         this.replaceState(
@@ -50,47 +53,47 @@ export default new Vuex.Store({
       }
       state.is_init = true
     },
-    set_auth_key (state, value) {
+    [m.SET_AUTH_KEY] (state, value) {
       state.trello_auth.key = value
     },
-    set_auth_token (state, value) {
+    [m.SET_AUTH_TOKEN] (state, value) {
       state.trello_auth.token = value
     },
-    set_connection_state (state, value) {
+    [m.SET_CONNECTION_STATE] (state, value) {
       state.trello_auth.connected = value
     },
-    set_boards (state, value) {
+    [m.SET_BOARDS] (state, value) {
       state.boards = value
     },
-    set_boards_selected (state, boards_selected_new) {
+    [m.SET_BOARDS_SELECTED] (state, boards_selected_new) {
       // Check if any board was de-selected
       state.boards_selected.forEach(board_id => {
         if (!boards_selected_new.includes(board_id)) {
           // Remove all cards associated with de-selected board
-          this.commit('remove_cards', board_id)
+          this.commit(m.REMOVE_CARDS, board_id)
           // console.log(`${board_id} was de-selected`)
         }
       })
       state.boards_selected = boards_selected_new
     },
-    set_last_refreshed (state, value) {
+    [m.SET_LAST_REFRESHED] (state, value) {
       state.last_refreshed = value
     },
-    set_cards_loading (state, value) {
+    [m.SET_CARDS_LOADING] (state, value) {
       state.cards_loading = value
     },
-    remove_cards (state, board_id) {
+    [m.REMOVE_CARDS] (state, board_id) {
       /* Remove cards for board_id */
       state.cards = state.cards.filter(c => c.board_id !== board_id)
     },
-    add_cards (state, { cards, board_id }) {
+    [m.ADD_CARDS] (state, { cards, board_id }) {
       /* Keep all cards not belonging to `board_id` and add all `cards` passed */
       state.cards = [
         ...state.cards.filter(c => c.board_id !== board_id),
         ...cards
       ]
     },
-    update_card (state, updated_card) {
+    [m.UPDATE_CARD] (state, updated_card) {
       // Find old card by card id
       let card_index = state.cards.findIndex(c => c.id === updated_card.id)
       let card = state.cards[card_index]
@@ -113,7 +116,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    get_my_boards (context) {
+    [a.GET_BOARDS] (context) {
       /*
        * Get list of boards from Trello.
        * Return Promise to allow error handling outside of action
@@ -127,7 +130,7 @@ export default new Vuex.Store({
           lists: 'open'
         }
       }).then(response => {
-        context.commit('set_connection_state', true)
+        context.commit(m.SET_CONNECTION_STATE, true)
 
         // Save boards in object with id as key
         let boards = {}
@@ -135,12 +138,12 @@ export default new Vuex.Store({
           boards[b.id] = b
         })
 
-        context.commit('set_boards', boards)
+        context.commit(m.SET_BOARDS, boards)
       })
     },
-    get_cards (context) {
+    [a.GET_CARDS] (context) {
       // Triggers loading indicators
-      context.commit('set_cards_loading', true)
+      context.commit(m.SET_CARDS_LOADING, true)
 
       // Store all api promises
       let api_promises = []
@@ -172,7 +175,7 @@ export default new Vuex.Store({
               }
             })
 
-            context.commit('add_cards', {
+            context.commit(m.ADD_CARDS, {
               cards: cards,
               board_id: board_id
             })
@@ -182,11 +185,11 @@ export default new Vuex.Store({
 
       // Wait for all api promises to finish before setting `last_refreshed` and `loading`
       Promise.all(api_promises).then(() => {
-        context.commit('set_last_refreshed', moment())
-        context.commit('set_cards_loading', false)
+        context.commit(m.SET_LAST_REFRESHED, moment())
+        context.commit(m.SET_CARDS_LOADING, false)
       })
     },
-    update_card (context, { card_id, data }) {
+    [a.UPDATE_CARD] (context, { card_id, data }) {
       /*
        * Update a card in Trello and update local cards array.
        * Data have to be ready for Trello!
@@ -198,12 +201,12 @@ export default new Vuex.Store({
         ...data
       }).then(response => {
         // Trello returns updated card. Save to app's store.
-        context.commit('update_card', response.data)
+        context.commit(m.UPDATE_CARD, response.data)
       })
     },
-    reload (context) {
+    [a.RELOAD] (context) {
       /* Alias for get_cards. Added because maybe future requires specific reload action */
-      context.dispatch('get_cards')
+      context.dispatch(a.GET_CARDS)
     }
   },
   getters: {

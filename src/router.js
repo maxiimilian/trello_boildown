@@ -1,6 +1,7 @@
 import VueRouter from 'vue-router'
 
 import store from './store'
+import m from './store/mutations.js'
 
 import ListView from './views/ListView.vue'
 import WeekView from './views/WeekView.vue'
@@ -20,7 +21,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   // Init store
   if (!store.state.is_init) {
-    store.commit('init_store')
+    store.commit(m.INIT_STORE)
   }
 
   // Check if auth details are present

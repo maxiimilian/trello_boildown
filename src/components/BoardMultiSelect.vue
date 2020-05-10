@@ -15,6 +15,8 @@
 
 <script>
 import moment from 'moment'
+import a from './../store/actions.js'
+import m from './../store/mutations.js'
 
 export default {
   name: 'BoardMultiSelect',
@@ -33,14 +35,14 @@ export default {
         return this.$store.state.boards_selected
       },
       set (value) {
-        this.$store.commit('set_boards_selected', value)
+        this.$store.commit(m.SET_BOARDS_SELECTED, value)
       }
     }
   },
   methods: {
     reload () {
       this.loading = true
-      this.$store.dispatch('reload').then(() => {
+      this.$store.dispatch(a.RELOAD).then(() => {
         this.loading = false
         this.last_refresh = moment().format('HH:mm')
       })
