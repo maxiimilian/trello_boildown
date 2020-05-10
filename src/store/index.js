@@ -28,14 +28,15 @@ function sort_cards_by_board_name (cards, asc = true) {
 
 export default new Vuex.Store({
   state: {
-    boards: {},
-    boards_selected: [],
-    cards: [],
+    is_init: false,
     trello_auth: {
       key: '',
       token: '',
       connected: false
     },
+    boards: {},
+    boards_selected: [],
+    cards: [],
     last_refreshed: undefined,
     cards_loading: false
   },
@@ -47,6 +48,7 @@ export default new Vuex.Store({
           Object.assign(state, JSON.parse(localStorage.getItem('store')))
         )
       }
+      state.is_init = true
     },
     set_auth_key (state, value) {
       state.trello_auth.key = value

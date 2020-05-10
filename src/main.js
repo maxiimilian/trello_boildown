@@ -21,7 +21,7 @@ new Vue({
   render: h => h(App),
   beforeCreate () {
     // Load data from local storage into store
-    this.$store.commit('init_store')
+    //this.$store.commit('init_store')
   },
   created () {
     // Populate boards and get cards, if key and token are set.
