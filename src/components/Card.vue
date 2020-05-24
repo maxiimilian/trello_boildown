@@ -8,9 +8,9 @@
             <div class="header"><a :href="card.shortUrl" target="_blank">{{ card.name }}</a></div>
             <div class="meta"><a :href="board.shortUrl" target="_blank">{{ board.name }}</a></div>
         </div>
-        <div class="extra content">
+        <div v-if="card.due !== null" class="extra content">
             <div class="left floated">
-                <div v-if="card.due !== null" class="ui label due" v-bind:class="due_color" v-bind:data-tooltip="due.tooltip" data-position="top left" data-inverted="">{{ due.short }}</div>
+                <div class="ui label due" v-bind:class="due_color" v-bind:data-tooltip="due.tooltip" data-position="top left" data-inverted="">{{ due.short }}</div>
             </div>
             <div class="right floated">
                 <a v-on:click="reschedule(1)" v-bind:data-tooltip="get_reschedule_tooltip(1)" data-position="top right" data-inverted="" class="reschedule_button">+1d</a>
@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     due () {
-      let due = moment(this.card.due)
+      let due = this.card.due
       return {
         short: due.calendar(null, {
           sameDay: '[Today]',
@@ -52,7 +52,7 @@ export default {
     },
     due_color () {
       // It is required for `tomorrow` to call moment() on `today` to get a cloned object!
-      let due = moment(this.card.due)
+      let due = this.card.due
       let today = moment().startOf('day')
       let tomorrow = moment(today).add(1, 'days')
 

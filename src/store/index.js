@@ -12,21 +12,44 @@ const trelloAPI = axios.create({
   baseURL: 'https://api.trello.com/1/'
 })
 
-function sort_cards_by_due (cards, asc = true) {
-  /* Returns a sorted card array, sorted ascending (default) or descending */
-  return cards.sort(function (c1, c2) {
-    return asc ? c1.due - c2.due : c2.due - c1.due
-  })
+function sort_by_title (c1, c2, asc = true) {
+  let ordering = 1
+  if (!asc) {
+    ordering = -1
+  }
+
+  if (c1.name > c2.name) {
+    return -1 * ordering
+  } else if (c1.name < c2.name) {
+    return 1 * ordering
+  } else {
+    return 0
+  }
 }
 
-function sort_cards_by_board_name (cards, asc = true) {
-  return cards.sort(function (c1, c2) {
-    if (c1.board_id === c2.board_id) {
-      return c1.name > c2.name ? -1 : 1
-    } else {
-      return c1.board_id > c2.board_id ? -1 : 1
-    }
-  })
+function sort_by_due (c1, c2, asc = true) {
+  // Automatically returns 0 if dates are the same
+  let ordering = 1
+  if (!asc) {
+    ordering = -1
+  }
+
+  return (c1.due - c2.due) * ordering
+}
+
+function sort_by_board (c1, c2, asc = true) {
+  let ordering = 1
+  if (!asc) {
+    ordering = -1
+  }
+
+  if (c1.board_id > c2.board_id) {
+    return -1 * ordering
+  } else if (c1.board_id < c2.board_id) {
+    return 1 * ordering
+  } else {
+    return 0
+  }
 }
 
 function preprocess_card (card, board_id) {
@@ -39,7 +62,7 @@ function preprocess_card (card, board_id) {
 
   // Create date object instead of date string
   if (card.due !== null) {
-    card['due'] = new Date(card.due)
+    card['due'] = moment(card.due)
   }
 
   return card
@@ -222,21 +245,45 @@ export default new Vuex.Store({
   },
   getters: {
     cards_not_scheduled: state => {
-      return sort_cards_by_board_name(
-        state.cards.filter(c => c.due === null)
-      )
+      return state.cards.filter(c => c.due === null).sort((c1, c2) => {
+        let s = sort_by_board(c1, c2)
+        if (s === 0) {
+          s = sort_by_title(c1, c2)
+        }
+        return s
+      })
     },
     cards_overdue: state => {
-      let today = new Date().setHours(0, 0, 0)
-      return sort_cards_by_due(
-        state.cards.filter(c => c.due !== null).filter(c => c.due < today)
-      )
+      let today = moment().startOf('day')
+      return state.cards.filter(
+        c => (c.due !== null) && (c.due < today)
+      ).sort((c1, c2) => {
+        // Sort by due date, board, title
+        let s = sort_by_due(c1, c2)
+        if (s === 0) {
+          s = sort_by_board(c1, c2)
+        }
+        if (s === 0) {
+          s = sort_by_title(c1, c2)
+        }
+        return s
+      })
     },
     cards_due: state => {
-      let today = new Date().setHours(0, 0, 0)
-      return sort_cards_by_due(
-        state.cards.filter(c => c.due !== null).filter(c => c.due >= today)
-      )
+      let today = moment().startOf('day')
+      return state.cards.filter(
+        c => (c.due !== null) && (c.due >= today)
+      ).sort((c1, c2) => {
+        // Sort by due date, board, title
+        let s = sort_by_due(c1, c2)
+        if (s === 0) {
+          s = sort_by_board(c1, c2)
+        }
+        if (s === 0) {
+          s = sort_by_title(c1, c2)
+        }
+        return s
+      })
     }
   }
 })

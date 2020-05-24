@@ -15,7 +15,8 @@ const router = new VueRouter({
     { path: '/week', component: WeekView },
     { path: '/auth', component: AuthView },
     { path: '*', component: Error404View }
-  ]
+  ],
+  linkActiveClass: 'active'
 })
 
 router.beforeEach((to, from, next) => {
