@@ -7,8 +7,10 @@ import App from './App.vue'
 import store from './store'
 import router from './router'
 
-import '../public/css/normalize.css'
-import '../public/libs/semantic-ui/semantic.min.css'
+import a from './store/actions.js'
+
+import '../include/css/normalize.css'
+import '../include/libs/semantic-ui/semantic.min.css'
 import './registerServiceWorker'
 
 Vue.config.productionTip = false
@@ -19,15 +21,11 @@ new Vue({
   store,
   router,
   render: h => h(App),
-  beforeCreate () {
-    // Load data from local storage into store
-    this.$store.commit('init_store')
-  },
   created () {
     // Populate boards and get cards, if key and token are set.
     if (this.$store.state.trello_auth.key !== '' && this.$store.state.trello_auth.token !== '') {
-      this.$store.dispatch('get_my_boards').then(() => {
-        this.$store.dispatch('get_cards')
+      this.$store.dispatch(a.GET_BOARDS).then(() => {
+        this.$store.dispatch(a.GET_CARDS)
       })
     }
   }

@@ -1,7 +1,10 @@
 <template>
     <div class="ui card">
         <div class="content">
-            <div class="right floated meta"><StatusIndicator :status="status" :msg="status_msg"/></div>
+            <div class="right floated meta">
+              <StatusIndicator :status="status" :msg="status_msg"/>
+              <Completer v-on:completed="mark_completed()" v-if="status == 'hidden'"></Completer>
+            </div>
             <div class="header"><a :href="card.shortUrl" target="_blank">{{ card.name }}</a></div>
             <div class="meta"><a :href="board.shortUrl" target="_blank">{{ board.name }}</a></div>
         </div>
@@ -10,9 +13,9 @@
                 <div v-if="card.due !== null" class="ui label due" v-bind:class="due_color" v-bind:data-tooltip="due.tooltip" data-position="top left" data-inverted="">{{ due.short }}</div>
             </div>
             <div class="right floated">
-                <a v-on:click="reschedule(1)" class="reschedule_button">+1d</a>
-                <a v-on:click="reschedule(2)" class="reschedule_button">+2d</a>
-                <a v-on:click="reschedule(7)" class="reschedule_button">+1w</a>
+                <a v-on:click="reschedule(1)" v-bind:data-tooltip="get_reschedule_tooltip(1)" data-position="top right" data-inverted="" class="reschedule_button">+1d</a>
+                <a v-on:click="reschedule(2)" v-bind:data-tooltip="get_reschedule_tooltip(2)" data-position="top right" data-inverted="" class="reschedule_button">+2d</a>
+                <a v-on:click="reschedule(7)" v-bind:data-tooltip="get_reschedule_tooltip(7)" data-position="top right" data-inverted="" class="reschedule_button">+1w</a>
             </div>
         </div>
     </div>
@@ -21,12 +24,16 @@
 <script>
 import moment from 'moment'
 import StatusIndicator from './StatusIndicator'
+import Completer from './Completer'
+
+import a from '../store/actions.js'
 
 export default {
   name: 'Card',
   props: ['card', 'board'],
   components: {
-    StatusIndicator
+    StatusIndicator,
+    Completer
   },
   computed: {
     due () {
@@ -76,6 +83,13 @@ export default {
       }
       return week.id
     },
+    list_completed_id () {
+      let completed = this.board.lists.find(l => l.name === 'Completed')
+      if (completed === undefined) {
+        return false
+      }
+      return completed.id
+    },
     advanced_rescheduling () {
       /*
       True, if a card is capable of advanced rescheduling.
@@ -93,15 +107,14 @@ export default {
   },
   methods: {
     reschedule (days) {
-      this.status = 'loading'
-
       let new_due = moment(this.card.due).add(days, 'days')
       let data = {
         due: new_due.toISOString()
       }
 
       // Advanced rescheduling is available if Week and Backlog column are defined
-      if (this.advanced_rescheduling) {
+      // Only move column if new due date is after now.
+      if (this.advanced_rescheduling && new_due.isAfter()) {
         if (moment().week() !== new_due.week()) {
           data['idList'] = this.list_backlog_id
         } else {
@@ -109,7 +122,36 @@ export default {
         }
       }
 
-      this.$store.dispatch('update_card', {
+      this.update_card(data)
+    },
+    mark_completed () {
+      // Set current time and date as due date and mark as completed
+      let data = {
+        due: moment().toISOString(),
+        dueComplete: true
+      }
+
+      // If available, move to the top of list `completed`
+      if (this.list_completed_id) {
+        data['idList'] = this.list_completed_id
+        data['pos'] = 'top'
+      }
+
+      // Trigger update and then reload
+      this.update_card(data).then(() => {
+        this.$store.dispatch(a.RELOAD)
+      })
+    },
+    get_reschedule_tooltip (days) {
+      let new_due = moment(this.card.due).add(days, 'days')
+      return new_due.format('dd, DD.MM.')
+    },
+    update_card (data) {
+      // Set status indicator to loading
+      this.status = 'loading'
+
+      // Dispatch to store which triggers api
+      return this.$store.dispatch(a.UPDATE_CARD, {
         card_id: this.card.id,
         data: data
       }).then(() => {

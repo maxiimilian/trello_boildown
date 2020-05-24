@@ -2,7 +2,9 @@
     <div v-bind:id="dow">
         <strong v-if="is_today">{{ dow_moment.format('dd, DD.MM.') }}</strong>
         <span v-if="!is_today">{{ dow_moment.format('dd, DD.MM.') }}</span>
-        <Card v-for="c in cards" v-bind:key="c.id" v-bind:card="c" v-bind:board="boards[c.board_id]"/>
+        <div class="ui cards">
+          <Card v-for="c in cards" v-bind:key="c.id" v-bind:card="c" v-bind:board="boards[c.board_id]"/>
+        </div>
     </div>
 </template>
 
