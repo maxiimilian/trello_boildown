@@ -29,6 +29,22 @@ function sort_cards_by_board_name (cards, asc = true) {
   })
 }
 
+function preprocess_card (card, board_id) {
+  // Return null if card does not match filter
+  if (card.dueComplete) return null
+  if (card.isTemplate) return null
+
+  // Attach board_id to card
+  card['board_id'] = board_id
+
+  // Create date object instead of date string
+  if (card.due !== null) {
+    card['due'] = new Date(card.due)
+  }
+
+  return card
+}
+
 export default new Vuex.Store({
   state: {
     is_init: false,
@@ -105,14 +121,16 @@ export default new Vuex.Store({
         }
       }
 
-      // @todo: Duplicate behavior here and in get_cards action
-      // convert due date to time object
-      if (card.due !== null) {
-        card['due'] = new Date(card.due)
-      }
+      // Process card
+      card = preprocess_card(card, card.board_id)
 
-      // Move updated card back to cards array
-      state.cards[card_index] = card
+      if (card !== null) {
+        // Move updated card back to cards array if not completed
+        state.cards[card_index] = card
+      } else {
+        // Remove if completed
+        state.cards = state.cards.filter(c => c.id !== updated_card.id)
+      }
     }
   },
   actions: {
@@ -163,16 +181,9 @@ export default new Vuex.Store({
 
             // Process each card
             response.data.forEach(c => {
-              // Only process cards which are not yet completed
-              // @todo: Duplicate behavior here and in update_card mutation
-              if (!c.dueComplete && !c.isTemplate) {
-                c['board_id'] = board_id
-                if (c.due !== null) {
-                  c['due'] = new Date(c.due)
-                }
-
-                cards.push(c)
-              }
+              // Preprocess card and push them to list if not discarded by filters (i.e. `null`)
+              c = preprocess_card(c, board_id)
+              if (c !== null) cards.push(c)
             })
 
             context.commit(m.ADD_CARDS, {

@@ -137,10 +137,8 @@ export default {
         data['pos'] = 'top'
       }
 
-      // Trigger update and then reload
-      this.update_card(data).then(() => {
-        this.$store.dispatch(a.RELOAD)
-      })
+      // Trigger update which will filter card if update is accepted
+      this.update_card(data)
     },
     get_reschedule_tooltip (days) {
       let new_due = moment(this.card.due).add(days, 'days')
