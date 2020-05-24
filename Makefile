@@ -1,9 +1,10 @@
 .PHONY: dist
+dc_dev = docker-compose -f docker-compose.dev.yml
 npm = docker-compose run --rm dev npm
 
 # Dev is default
 dev:
-	docker-compose up
+	$(dc_dev) up
 
 # Build and deploy current version
 dist:
@@ -12,13 +13,11 @@ dist:
 	git rev-parse --short HEAD > commit.txt
 	git rev-parse --abbrev-ref HEAD >> commit.txt
 	tar cf dist.tar dist/ docker-compose.prod.yml commit.txt
-	#scp dist.tar storage:~
-	#rm dist.tar
 
 # Run this before first use in new environment
 setup:
-	docker-compose build
+	$(dc_dev) build
 	$(npm) install
 
 shell:
-	docker-compose run --rm dev /bin/bash
+	$(dc_dev) run --rm dev /bin/bash
